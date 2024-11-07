@@ -1,0 +1,1 @@
+export const CREATE_LINK = "/v1/create-link";

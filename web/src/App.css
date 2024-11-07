@@ -1,0 +1,14 @@
+.Main {
+  width: 100%;
+  height: 100%;
+}
+
+.Section {
+  display: flex;
+  flex-direction: column;
+}
+
+.Form {
+  display: flex;
+  gap: 6px;
+}
