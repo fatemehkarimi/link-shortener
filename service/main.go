@@ -11,7 +11,7 @@ type Link struct {
 }
 
 func main() {
-	http.HandleFunc("/create-link", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/v1/create-link", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -29,6 +29,7 @@ func main() {
 		w.WriteHeader(http.StatusCreated)
 	})
 
+	fmt.Println("Running the server")
 	if err := http.ListenAndServe(":8080", nil); err != http.ErrServerClosed {
 		panic(err)
 	}
