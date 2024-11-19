@@ -12,6 +12,14 @@ type Link struct {
 
 func main() {
 	http.HandleFunc("/v1/create-link", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
@@ -21,6 +29,7 @@ func main() {
 		err := json.NewDecoder(r.Body).Decode(link)
 
 		if err != nil {
+			fmt.Println("error = ", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
