@@ -23,9 +23,13 @@ function App() {
       body: JSON.stringify({
         URL: value,
       }),
-    }).then(() => {
-      setResult("Link successfuly created");
-    });
+    })
+      .then(() => {
+        setResult("Link successfuly created");
+      })
+      .catch((error) => {
+        window.console.log("error = ", error);
+      });
   };
 
   return (

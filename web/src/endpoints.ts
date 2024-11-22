@@ -1,1 +1,1 @@
-export const CREATE_LINK = "/v1/create-link";
+export const CREATE_LINK = "http://192.168.1.4:8080/v1/create-link";
