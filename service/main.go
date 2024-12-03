@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	host   = "158.255.74.123"
+	host   = "localhost"
 	port   = 5432
 	dbname = "link_shortener"
 )
@@ -24,7 +24,8 @@ type Link struct {
 func getDBCredentials() string {
 	user := os.Getenv("db_user")
 	password := os.Getenv("db_password")
-	credentials := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	credentials := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", user, password, host, port, dbname)
+
 	return credentials
 }
 
