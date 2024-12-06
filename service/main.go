@@ -12,6 +12,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var now = time.Now
+
 const (
 	host   = "localhost"
 	port   = 5432
@@ -22,7 +24,11 @@ type Link struct {
 	URL string `json:"URL"`
 }
 
-var now = time.Now
+type ResponseCreateLink struct {
+	Hash       string    `json:"hash"`
+	Create_at  time.Time `json:"create_at"`
+	Expires_at time.Time `json:"expires_at"`
+}
 
 func getDBCredentials() string {
 	user := os.Getenv("db_user")
@@ -48,6 +54,7 @@ func (h *Handler) createLinkHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusNoContent)
 		return
@@ -75,7 +82,16 @@ func (h *Handler) createLinkHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	response := ResponseCreateLink{
+		Hash:       linkHash,
+		Create_at:  create_at,
+		Expires_at: expires_at,
+	}
 	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func generateLinkHash(str string) string {
