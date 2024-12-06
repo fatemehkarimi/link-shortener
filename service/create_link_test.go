@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"database/sql/driver"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +13,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type AnyTime struct {
+	formattedTime string
+}
+
+func (a AnyTime) Match(v driver.Value) bool {
+	time, ok := v.(time.Time)
+	return ok && time.Format("2006-01-02") == a.formattedTime
+}
+
 func TestCreateLink(t *testing.T) {
 	now = func() time.Time { return time.Date(2024, time.December, 6, 11, 7, 12, 12, time.UTC) }
 	db, mock, err := sqlmock.New()
@@ -20,7 +30,7 @@ func TestCreateLink(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectExec("INSERT INTO urls\\(original_url, short_code, create_date, expires_at\\)").
-		WithArgs("www.google.com", "480f2ef8fc12", sqlmock.AnyArg(), sqlmock.AnyArg()).
+		WithArgs("www.google.com", "480f2ef8fc12", AnyTime{"2024-12-06"}, AnyTime{"2024-12-13"}).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	payload := []byte(`{"URL": "www.google.com"}`)
@@ -42,7 +52,7 @@ func TestCreateDifferentLinkHashForSameLink(t *testing.T) {
 	defer db.Close()
 
 	mock.ExpectExec("INSERT INTO urls\\(original_url, short_code, create_date, expires_at\\)").
-		WithArgs("www.google.com", "e80fec96bcb4", sqlmock.AnyArg(), sqlmock.AnyArg()).
+		WithArgs("www.google.com", "e80fec96bcb4", AnyTime{"2024-12-06"}, AnyTime{"2024-12-13"}).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	payload := []byte(`{"URL": "www.google.com"}`)

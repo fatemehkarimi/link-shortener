@@ -68,7 +68,9 @@ func (h *Handler) createLinkHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	linkHash := generateLinkHash(link.URL)
-	err = insertIntoDatabase(h.DB, link.URL, linkHash, time.Now(), time.Now())
+	create_at := time.Now()
+	expires_at := create_at.AddDate(0, 0, 7)
+	err = insertIntoDatabase(h.DB, link.URL, linkHash, create_at, expires_at)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
