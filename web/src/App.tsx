@@ -1,8 +1,10 @@
-import TextField from "@mui/material/TextField/TextField";
 import Button from "@mui/material/Button/Button";
+import TextField from "@mui/material/TextField/TextField";
 import { useState } from "react";
 import "./App.css";
 import { CREATE_LINK } from "./endpoints";
+import type { ResponseCreateLink } from "./type";
+import { Link } from "@mui/material";
 
 function App() {
   const [value, setValue] = useState<string>("");
@@ -24,9 +26,8 @@ function App() {
         URL: value,
       }),
     })
-      .then(() => {
-        setResult("Link successfuly created");
-      })
+      .then((res) => res.json())
+      .then((response: ResponseCreateLink) => setResult(response.hash))
       .catch((error) => {
         window.console.log("error = ", error);
       });
@@ -45,7 +46,13 @@ function App() {
             Shorten URL
           </Button>
         </div>
-        {result && <p>{result}</p>}
+        {result && (
+          <div className="Result">
+            <Link
+              href={`http://localhost/${result}`}
+            >{`http://localhost/${result}`}</Link>
+          </div>
+        )}
       </div>
     </div>
   );
