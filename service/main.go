@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -20,6 +21,8 @@ const (
 type Link struct {
 	URL string `json:"URL"`
 }
+
+var now = time.Now
 
 func getDBCredentials() string {
 	user := os.Getenv("db_user")
@@ -64,13 +67,20 @@ func (h *Handler) createLinkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("create link", link)
-	err = insertIntoDatabase(h.DB, link.URL, "hello fatemeh", time.Now(), time.Now())
+	linkHash := generateLinkHash(link.URL)
+	err = insertIntoDatabase(h.DB, link.URL, linkHash, time.Now(), time.Now())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
+}
+
+func generateLinkHash(str string) string {
+	strWithDate := str + now().String()
+	hash := sha256.Sum256([]byte(strWithDate))
+	result := fmt.Sprintf("%x", hash)
+	return result[:12]
 }
 
 func main() {
