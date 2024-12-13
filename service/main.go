@@ -110,15 +110,8 @@ func (h *Handler) getURLByHash(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	requestData := &RequestGetURLByHash{}
-	err := json.NewDecoder(r.Body).Decode(requestData)
-
-	if err != nil {
-		fmt.Println("error = ", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-	originalURL, err := getLinkByHashFromDb(h.DB, requestData.Hash)
+	hash := r.URL.Query().Get("hash")
+	originalURL, err := getLinkByHashFromDb(h.DB, hash)
 	if err != nil {
 		http.Error(w, "url not found", http.StatusNotFound)
 		return
