@@ -73,7 +73,7 @@ func TestGetLinkByHashFound(t *testing.T) {
 	assert.NoError(t, err)
 	defer db.Close()
 
-	mock.ExpectQuery(`SELECT original_url FROM urls WHERE hash=\$1`).
+	mock.ExpectQuery(`SELECT original_url FROM urls WHERE short_code=\$1`).
 		WithArgs("e577cd4e510c").
 		WillReturnRows(sqlmock.NewRows([]string{"original_url"}).AddRow("https://www.google.com"))
 
@@ -95,7 +95,7 @@ func TestGetLinkByHashNotFound(t *testing.T) {
 
 	defer db.Close()
 
-	mock.ExpectQuery(`SELECT original_url FROM urls WHERE hash=\$1`).
+	mock.ExpectQuery(`SELECT original_url FROM urls WHERE short_code=\$1`).
 		WithArgs("e577cd4e510c").
 		WillReturnError(sql.ErrNoRows)
 

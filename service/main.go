@@ -37,7 +37,7 @@ func insertIntoDatabase(db *sql.DB, orignal_url, short_code string, create_date,
 }
 
 func getLinkByHashFromDb(db *sql.DB, hash string) (*string, error) {
-	query := `SELECT original_url FROM urls WHERE hash=$1`
+	query := `SELECT original_url FROM urls WHERE short_code=$1`
 	var originalURL string
 	err := db.QueryRow(query, hash).Scan(&originalURL)
 	if err != nil {
