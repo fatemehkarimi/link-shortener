@@ -20,16 +20,6 @@ const (
 	dbname = "link_shortener"
 )
 
-type Link struct {
-	URL string `json:"URL"`
-}
-
-type ResponseCreateLink struct {
-	Hash       string    `json:"hash"`
-	Create_at  time.Time `json:"create_at"`
-	Expires_at time.Time `json:"expires_at"`
-}
-
 func getDBCredentials() string {
 	user := os.Getenv("db_user")
 	password := os.Getenv("db_password")
@@ -44,6 +34,16 @@ func insertIntoDatabase(db *sql.DB, orignal_url, short_code string, create_date,
 
 	_, err := db.Exec(query, orignal_url, short_code, create_date, expires_at)
 	return err
+}
+
+func getLinkByHashFromDb(db *sql.DB, hash string) (*string, error) {
+	query := `SELECT original_url FROM urls WHERE hash=$1`
+	var originalURL string
+	err := db.QueryRow(query, hash).Scan(&originalURL)
+	if err != nil {
+		return nil, err
+	}
+	return &originalURL, nil
 }
 
 type Handler struct {
@@ -65,8 +65,8 @@ func (h *Handler) createLinkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	link := &Link{}
-	err := json.NewDecoder(r.Body).Decode(link)
+	requestData := &RequestCreateLink{}
+	err := json.NewDecoder(r.Body).Decode(requestData)
 
 	if err != nil {
 		fmt.Println("error = ", err)
@@ -74,10 +74,11 @@ func (h *Handler) createLinkHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	linkHash := generateLinkHash(link.URL)
-	create_at := time.Now()
+	linkHash := generateLinkHash(requestData.URL)
+	create_at := now()
 	expires_at := create_at.AddDate(0, 0, 7)
-	err = insertIntoDatabase(h.DB, link.URL, linkHash, create_at, expires_at)
+
+	err = insertIntoDatabase(h.DB, requestData.URL, linkHash, create_at, expires_at)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -92,6 +93,34 @@ func (h *Handler) createLinkHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func (h *Handler) getURLByHash(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	requestData := &RequestGetURLByHash{}
+	err := json.NewDecoder(r.Body).Decode(requestData)
+
+	if err != nil {
+		fmt.Println("error = ", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	originalURL, err := getLinkByHashFromDb(h.DB, requestData.Hash)
+	if err != nil {
+		http.Error(w, "url not found", http.StatusNotFound)
+		return
+	}
+
+	if originalURL != nil {
+		http.Redirect(w, r, *originalURL, http.StatusFound)
+		return
+	}
+
+	http.Error(w, "not found", http.StatusNotFound)
 }
 
 func generateLinkHash(str string) string {
@@ -118,6 +147,7 @@ func main() {
 
 	handler := &Handler{db}
 	http.HandleFunc("/v1/create-link", handler.createLinkHandler)
+	http.HandleFunc("/v1/get-link-by-hash", handler.getURLByHash)
 
 	fmt.Println("Running the server")
 	if err := http.ListenAndServe(":8080", nil); err != http.ErrServerClosed {

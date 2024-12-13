@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"database/sql/driver"
 	"net/http"
 	"net/http/httptest"
@@ -64,4 +65,47 @@ func TestCreateDifferentLinkHashForSameLink(t *testing.T) {
 	handler.createLinkHandler(rr, req)
 
 	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestGetLinkByHashFound(t *testing.T) {
+	db, mock, err := sqlmock.New()
+
+	assert.NoError(t, err)
+	defer db.Close()
+
+	mock.ExpectQuery(`SELECT original_url FROM urls WHERE hash=\$1`).
+		WithArgs("e577cd4e510c").
+		WillReturnRows(sqlmock.NewRows([]string{"original_url"}).AddRow("https://www.google.com"))
+
+	payload := []byte(`{"hash": "e577cd4e510c"}`)
+	req, err := http.NewRequest(http.MethodGet, "/v1/get-link-by-hash", bytes.NewBuffer(payload))
+	assert.NoError(t, err)
+
+	handler := &Handler{DB: db}
+	rr := httptest.NewRecorder()
+
+	handler.getURLByHash(rr, req)
+	assert.Equal(t, rr.Result().StatusCode, http.StatusFound)
+	assert.Equal(t, rr.Header().Get("Location"), "https://www.google.com")
+}
+
+func TestGetLinkByHashNotFound(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
+
+	defer db.Close()
+
+	mock.ExpectQuery(`SELECT original_url FROM urls WHERE hash=\$1`).
+		WithArgs("e577cd4e510c").
+		WillReturnError(sql.ErrNoRows)
+
+	payload := []byte(`{"hash": "e577cd4e510c"}`)
+	req, err := http.NewRequest(http.MethodGet, "/v1/get-link-by-hash", bytes.NewBuffer(payload))
+	assert.NoError(t, err)
+
+	handler := &Handler{DB: db}
+	rr := httptest.NewRecorder()
+
+	handler.getURLByHash(rr, req)
+	assert.Equal(t, rr.Result().StatusCode, http.StatusNotFound)
 }
