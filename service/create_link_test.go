@@ -77,8 +77,7 @@ func TestGetLinkByHashFound(t *testing.T) {
 		WithArgs("e577cd4e510c").
 		WillReturnRows(sqlmock.NewRows([]string{"original_url"}).AddRow("https://www.google.com"))
 
-	payload := []byte(`{"hash": "e577cd4e510c"}`)
-	req, err := http.NewRequest(http.MethodGet, "/v1/get-link-by-hash", bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodGet, "/v1/get-link-by-hash?hash=e577cd4e510c", nil)
 	assert.NoError(t, err)
 
 	handler := &Handler{DB: db}
@@ -99,8 +98,7 @@ func TestGetLinkByHashNotFound(t *testing.T) {
 		WithArgs("e577cd4e510c").
 		WillReturnError(sql.ErrNoRows)
 
-	payload := []byte(`{"hash": "e577cd4e510c"}`)
-	req, err := http.NewRequest(http.MethodGet, "/v1/get-link-by-hash", bytes.NewBuffer(payload))
+	req, err := http.NewRequest(http.MethodGet, "/v1/get-link-by-hash?hash=e577cd4e510c", nil)
 	assert.NoError(t, err)
 
 	handler := &Handler{DB: db}
