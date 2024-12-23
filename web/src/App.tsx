@@ -1,12 +1,13 @@
 import Button from "@mui/material/Button/Button";
 import TextField from "@mui/material/TextField/TextField";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
-import { CREATE_LINK } from "./endpoints";
+import { CREATE_LINK, GET_LINK_BY_HASH } from "./endpoints";
 import type { ResponseCreateLink } from "./type";
 import { Link } from "@mui/material";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 
-function App() {
+function CreateShortLinkPage() {
   const [value, setValue] = useState<string>("");
   const [result, setResult] = useState<string>("");
 
@@ -49,12 +50,46 @@ function App() {
         {result && (
           <div className="Result">
             <Link
-              href={`http://localhost/${result}`}
-            >{`http://localhost/${result}`}</Link>
+              href={`http://158.255.74.123/${result}`}
+              target="_blank"
+            >{`http://158.255.74.123/${result}`}</Link>
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+function HashToOriginalUrlPage() {
+  const location = useLocation();
+  const pathname = location.pathname.startsWith("/")
+    ? location.pathname.slice(1)
+    : location.pathname;
+
+  useEffect(() => {
+    fetch(GET_LINK_BY_HASH + `?hash=${pathname}`, {
+      method: "get",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .catch((err) => {
+        window.console.log("here err = ", err);
+      });
+  }, [pathname]);
+  return null;
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/:hash" element={<HashToOriginalUrlPage />} />
+        <Route index path="*" element={<CreateShortLinkPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
