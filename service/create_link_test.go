@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -85,7 +86,12 @@ func TestGetLinkByHashFound(t *testing.T) {
 
 	handler.getURLByHash(rr, req)
 	assert.Equal(t, rr.Result().StatusCode, http.StatusFound)
-	assert.Equal(t, rr.Header().Get("Location"), "https://www.google.com")
+
+	var response ResponseGetURLByHash
+	err = json.NewDecoder(rr.Body).Decode(&response)
+	assert.NoError(t, err)
+
+	assert.Equal(t, "https://www.google.com", *response.URL)
 }
 
 func TestGetLinkByHashNotFound(t *testing.T) {

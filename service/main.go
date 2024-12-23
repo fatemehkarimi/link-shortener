@@ -118,7 +118,13 @@ func (h *Handler) getURLByHash(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if originalURL != nil {
-		http.Redirect(w, r, *originalURL, http.StatusFound)
+		w.WriteHeader(http.StatusFound)
+		response := ResponseGetURLByHash{
+			URL: originalURL,
+		}
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 
