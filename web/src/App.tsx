@@ -1,11 +1,11 @@
+import { Link } from "@mui/material";
 import Button from "@mui/material/Button/Button";
 import TextField from "@mui/material/TextField/TextField";
 import { useEffect, useState } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./App.css";
 import { CREATE_LINK, GET_LINK_BY_HASH } from "./endpoints";
 import type { ResponseCreateLink } from "./type";
-import { Link } from "@mui/material";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 
 function CreateShortLinkPage() {
   const [value, setValue] = useState<string>("");
@@ -62,6 +62,7 @@ function CreateShortLinkPage() {
 
 function HashToOriginalUrlPage() {
   const location = useLocation();
+
   const pathname = location.pathname.startsWith("/")
     ? location.pathname.slice(1)
     : location.pathname;
@@ -75,8 +76,11 @@ function HashToOriginalUrlPage() {
       },
     })
       .then((res) => res.json())
+      .then((res: { URL: string }) => {
+        window.location.href = res.URL;
+      })
       .catch((err) => {
-        window.console.log("here err = ", err);
+        window.console.log("err = ", err);
       });
   }, [pathname]);
   return null;
