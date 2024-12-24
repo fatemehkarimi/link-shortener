@@ -50,9 +50,9 @@ function CreateShortLinkPage() {
         {result && (
           <div className="Result">
             <Link
-              href={`http://158.255.74.123/${result}`}
+              href={`${window.location.origin}/${result}`}
               target="_blank"
-            >{`http://158.255.74.123/${result}`}</Link>
+            >{`${window.location.origin}/${result}`}</Link>
           </div>
         )}
       </div>
