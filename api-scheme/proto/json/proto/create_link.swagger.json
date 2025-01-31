@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api-scheme/proto/create_link.proto",
+    "title": "proto/create_link.proto",
     "version": "version not set"
   },
   "tags": [
