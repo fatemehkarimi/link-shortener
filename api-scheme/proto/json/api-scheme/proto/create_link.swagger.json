@@ -1,0 +1,73 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api-scheme/proto/create_link.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "LinkShortener"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ResponseCreateLink": {
+      "type": "object",
+      "properties": {
+        "Hash": {
+          "type": "string"
+        },
+        "CreateAt": {
+          "type": "string",
+          "format": "int64"
+        },
+        "ExpiresAt": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "v1ResponseGetLinkByHash": {
+      "type": "object",
+      "properties": {
+        "URL": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
