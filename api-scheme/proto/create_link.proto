@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package org.link_shortener.v1;
 
-option go_package="github.com/fatemehkarimi/link-shortener/proto/src/golang";
+option go_package="github.com/fatemehkarimi/link-shortener/api-scheme/proto/src/golang";
 
 service LinkShortener {
     rpc CreateLink(RequestCreateLink) returns(ResponseCreateLink);
