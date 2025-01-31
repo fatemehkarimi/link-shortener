@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.20.3
-// source: proto/create_link.proto
+// source: create_link.proto
 
 package golang
 
@@ -155,5 +155,5 @@ var LinkShortener_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/create_link.proto",
+	Metadata: "create_link.proto",
 }

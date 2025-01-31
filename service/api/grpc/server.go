@@ -8,7 +8,7 @@ import (
 	"net"
 	"time"
 
-	golang "github.com/fatemehkarimi/link-shortener/api-scheme/proto/src/golang/proto"
+	golang "github.com/fatemehkarimi/link-shortener/api-scheme/proto/src/golang"
 	"github.com/fatemehkarimi/link-shortener/service/db"
 	"github.com/fatemehkarimi/link-shortener/service/internal"
 	"google.golang.org/grpc"

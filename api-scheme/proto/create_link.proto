@@ -4,6 +4,8 @@ package org.link_shortener.v1;
 
 option go_package="github.com/fatemehkarimi/link-shortener/api-scheme/proto/src/golang";
 
+import "google/api/annotations.proto";
+
 service LinkShortener {
     rpc CreateLink(RequestCreateLink) returns(ResponseCreateLink);
     rpc GetLinkByHash(RequestGetLinkByHash) returns(ResponseGetLinkByHash);
