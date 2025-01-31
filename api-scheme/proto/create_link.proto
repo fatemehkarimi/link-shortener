@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package org.link_shortener.v1;
+
+option go_package="github.com/fatemehkarimi/link-shortener/proto/src/golang";
+
+service LinkShortener {
+    rpc CreateLink(RequestCreateLink) returns(ResponseCreateLink);
+    rpc GetLinkByHash(RequestGetLinkByHash) returns(ResponseGetLinkByHash);
+}
+
+message RequestCreateLink {
+    string URL = 1;
+}
+
+message ResponseCreateLink {
+    string Hash = 1;
+    int64 CreateAt = 2;
+    int64 ExpiresAt = 3;
+}
+
+message RequestGetLinkByHash {
+    string Hash = 1;
+}
+
+message ResponseGetLinkByHash {
+    string URL = 1;
+}
