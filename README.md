@@ -1,2 +1,1 @@
-# One hundred golang projects
-
+# Link shortener
