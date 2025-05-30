@@ -1,12 +1,12 @@
 FROM golang:latest as build
 
 WORKDIR /app
-COPY go.mod .
+COPY go.mod go.sum ./
 
 RUN go mod download
 
 COPY . .
-RUN go build -o link-shortener
+RUN go build -o link-shortener service/main.go
 
 
 FROM ubuntu:22.04 as run
